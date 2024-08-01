@@ -1,0 +1,174 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww37900\viewh21300\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>Library of Congress Call Number Game</title>\
+    <style>\
+        body \{\
+            font-family: Arial, sans-serif;\
+            display: flex;\
+            justify-content: center;\
+            align-items: center;\
+            height: 100vh;\
+            margin: 0;\
+            background-color: #f0f0f0;\
+        \}\
+        #game-container \{\
+            text-align: center;\
+            background-color: white;\
+            padding: 20px;\
+            border-radius: 10px;\
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);\
+            max-width: 600px;\
+            width: 100%;\
+        \}\
+        #book-container \{\
+            display: flex;\
+            flex-wrap: wrap;\
+            justify-content: center;\
+            margin-bottom: 20px;\
+        \}\
+        .book \{\
+            background-color: #4CAF50;\
+            color: white;\
+            padding: 10px;\
+            margin: 5px;\
+            cursor: pointer;\
+            user-select: none;\
+        \}\
+        #message, #hint, #score \{\
+            margin-top: 20px;\
+            font-weight: bold;\
+        \}\
+        button \{\
+            background-color: #008CBA;\
+            border: none;\
+            color: white;\
+            padding: 10px 20px;\
+            text-align: center;\
+            text-decoration: none;\
+            display: inline-block;\
+            font-size: 16px;\
+            margin: 4px 2px;\
+            cursor: pointer;\
+        \}\
+        #hint-button \{\
+            background-color: #f44336;\
+        \}\
+    </style>\
+</head>\
+<body>\
+    <div id="game-container">\
+        <h1>Arrange the Library Books</h1>\
+        <p>Click on the books to arrange them in the correct order based on their Library of Congress call numbers.</p>\
+        <div id="book-container"></div>\
+        <button onclick="checkOrder()">Check Order</button>\
+        <button onclick="newGame()">New Game</button>\
+        <button id="hint-button" onclick="getHint()">Hint</button>\
+        <div id="score">Score: 100</div>\
+        <div id="message"></div>\
+        <div id="hint"></div>\
+    </div>\
+\
+    <script>\
+        let books = [];\
+        let selectedBooks = [];\
+        let hintIndex = 0;\
+        let score = 100;\
+        let hintsUsed = 0;\
+        const hints = [\
+            "LOC call numbers are sorted alphabetically by the first letter.",\
+            "If the first letters are the same, sort by the second letter.",\
+            "After the letters, compare the whole numbers.",\
+            "If the whole numbers are the same, compare the decimal parts.",\
+            "Remember, it's like alphabetical order, but with numbers too!"\
+        ];\
+\
+        function generateCallNumber() \{\
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\
+            const firstLetter = letters[Math.floor(Math.random() * letters.length)];\
+            const secondLetter = letters[Math.floor(Math.random() * letters.length)];\
+            const number = Math.floor(Math.random() * 9000) + 1000;\
+            const decimal = Math.random().toFixed(2).substring(2);\
+            return `$\{firstLetter\}$\{secondLetter\} $\{number\}.$\{decimal\}`;\
+        \}\
+\
+        function newGame() \{\
+            books = [];\
+            selectedBooks = [];\
+            hintIndex = 0;\
+            score = 100;\
+            hintsUsed = 0;\
+            for (let i = 0; i < 5; i++) \{\
+                books.push(generateCallNumber());\
+            \}\
+            books.sort();\
+            renderBooks();\
+            document.getElementById('message').textContent = '';\
+            document.getElementById('hint').textContent = '';\
+            document.getElementById('score').textContent = `Score: $\{score\}`;\
+        \}\
+\
+        function renderBooks() \{\
+            const bookContainer = document.getElementById('book-container');\
+            bookContainer.innerHTML = '';\
+            const shuffledBooks = [...books].sort(() => Math.random() - 0.5);\
+            shuffledBooks.forEach(book => \{\
+                const bookElement = document.createElement('div');\
+                bookElement.className = 'book';\
+                bookElement.textContent = book;\
+                bookElement.onclick = () => selectBook(book);\
+                bookContainer.appendChild(bookElement);\
+            \});\
+        \}\
+\
+        function selectBook(book) \{\
+            const index = selectedBooks.indexOf(book);\
+            if (index === -1) \{\
+                selectedBooks.push(book);\
+            \} else \{\
+                selectedBooks.splice(index, 1);\
+            \}\
+            renderBooks();\
+            const bookElements = document.querySelectorAll('.book');\
+            bookElements.forEach(element => \{\
+                if (selectedBooks.includes(element.textContent)) \{\
+                    element.style.backgroundColor = '#008CBA';\
+                \} else \{\
+                    element.style.backgroundColor = '#4CAF50';\
+                \}\
+            \});\
+        \}\
+\
+        function checkOrder() \{\
+            const correct = JSON.stringify(selectedBooks) === JSON.stringify(books);\
+            if (correct) \{\
+                document.getElementById('message').textContent = 'Correct! Well done!';\
+                document.getElementById('score').textContent = `Final Score: $\{score\}`;\
+            \} else \{\
+                document.getElementById('message').textContent = 'Not quite right. Try again!';\
+                score -= 5;\
+                document.getElementById('score').textContent = `Score: $\{score\}`;\
+            \}\
+        \}\
+\
+        function getHint() \{\
+            document.getElementById('hint').textContent = hints[hintIndex];\
+            hintIndex = (hintIndex + 1) % hints.length;\
+            hintsUsed++;\
+            score -= 10;\
+            document.getElementById('score').textContent = `Score: $\{score\}`;\
+        \}\
+\
+        newGame();\
+    </script>\
+</body>\
+</html>}
